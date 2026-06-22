@@ -1,10 +1,723 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>මගේ පළමු වෙබ් පිටුව</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sithija APIs Advanced Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #030a16;
+            color: #ffffff;
+            padding-bottom: 50px;
+        }
+
+        /* Pre-login Loading Animation Style */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030a16;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #051124;
+            border-top: 5px solid #00e5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+
+        .loading-text {
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #ffffff;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+        }
+
+        /* Auth Screen Styling */
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030a16;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .auth-container {
+            background-color: #051124;
+            border: 1px solid #0d2347;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+        }
+
+        .auth-title {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00e5ff;
+        }
+
+        /* Header */
+        .header {
+            background-color: #051124;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid #0d2347;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #ffffff;
+        }
+
+        .logo-text .highlight { color: #00e5ff; }
+        .status-area { font-size: 12px; display: flex; gap: 15px; align-items: center; color: #8fa0bc; }
+        .green-text { color: #00ff66; }
+
+        .btn-admin-tab {
+            background-color: #bd081c;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-buy-coins {
+            background-color: #00ff66;
+            color: #030a16;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 1500px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                grid-template-columns: 1.4fr 1.1fr;
+            }
+        }
+
+        .column-title {
+            font-size: 16px;
+            color: #00e5ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #0d2347;
+            padding-bottom: 8px;
+        }
+
+        /* Global User Box */
+        .global-user-box {
+            background-color: #051124;
+            border: 1px solid #0d2347;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .global-user-box label {
+            font-size: 12px;
+            color: #8fa0bc;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .global-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .global-coin-badge {
+            background-color: #102a45;
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        /* Notice Banner */
+        .notice-banner {
+            background-color: rgba(255, 189, 46, 0.1);
+            border: 1px solid #ffbd2e;
+            color: #ffbd2e;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- API LIST --- */
+        .api-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 750px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .api-card {
+            background-color: #051124;
+            border: 1px solid #0d2347;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .api-info { display: flex; align-items: center; gap: 12px; }
+        .icon-box {
+            background-color: #0a2246; color: #00e5ff;
+            width: 35px; height: 35px; display: flex;
+            justify-content: center; align-items: center;
+            border-radius: 6px; font-size: 14px;
+        }
+
+        .text-box h3 { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .method-badge { background-color: #102a45; color: #8fa0bc; font-size: 8px; padding: 2px 4px; border-radius: 3px; }
+        .text-box p { color: #6c7d98; font-size: 11px; margin-top: 2px; }
+
+        .card-bottom { display: flex; gap: 8px; }
+        .api-input {
+            flex: 1; background-color: #030a16;
+            border: 1px solid #0d2347; color: #ffffff;
+            padding: 8px 12px; border-radius: 6px; font-size: 12px;
+        }
+
+        .btn { padding: 8px 15px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; display: flex; align-items: center; gap: 4px; }
+        .btn-test { background-color: #0055ff; color: white; }
+        .btn-test:hover { background-color: #0044cc; }
+
+        .auth-input-group { margin-bottom: 15px; }
+        .auth-input-group label { display: block; font-size: 12px; color: #8fa0bc; margin-bottom: 5px; }
+        .auth-input { width: 100%; padding: 10px; background-color: #030a16; border: 1px solid #0d2347; color: white; border-radius: 6px; }
+
+        /* --- DISPLAY PANEL --- */
+        .display-panel {
+            background-color: #051124;
+            border: 1px solid #0d2347;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            height: 650px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .panel-header {
+            display: flex; align-items: center; gap: 10px;
+            background-color: #030a16; padding: 6px 10px;
+            border-radius: 50px; border: 1px solid #0d2347; margin-bottom: 10px;
+        }
+
+        .chrome-dots { display: flex; gap: 4px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-red { background-color: #ff5f56; }
+        .dot-yellow { background-color: #ffbd2e; }
+        .dot-green { background-color: #27c93f; }
+        .browser-url-bar { flex: 1; font-size: 11px; color: #8fa0bc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .browser-body { flex: 1; background-color: #ffffff; border-radius: 6px; overflow: hidden; }
+        .browser-iframe { width: 100%; height: 100%; border: none; background-color: #ffffff; }
+        .placeholder-text { color: #6c7d98; font-size: 12px; text-align: center; margin-top: 220px; font-family: sans-serif; padding: 10px; }
+        
+        .logout-link { color: #ff5f56; font-size: 11px; text-decoration: underline; cursor: pointer; margin-left: 10px; }
+        .loading-view { color: #ffbd2e; font-size: 14px; text-align: center; margin-top: 200px; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+        /* Package Styles */
+        .pkg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; }
+        .pkg-card { background: #030a16; border: 1px solid #0d2347; border-radius: 8px; padding: 15px; text-align: center; }
+        .pkg-title { font-size: 18px; color: #00ff66; font-weight: bold; margin-bottom: 10px; }
+        .btn-buynow { background: #00e5ff; color: #030a16; border: none; width: 100%; padding: 8px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    </style>
 </head>
 <body>
-    <h1>ආයුබෝවන්! මගේ වෙබ් අඩවියට සාදරයෙන් පිළිගන්නවා.</h1>
-    <p>මේක GitHub Pages හරහා සාර්ථකව Host කරපු වෙබ් පිටුවක්.</p>
+
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <div class="loading-text">SITHIJA <span style="color: #00e5ff;">APIs</span></div>
+    </div>
+
+    <div id="auth-screen" style="display:none;">
+        <div class="auth-container">
+            <div class="auth-title" id="auth-panel-title">SITHIJA APIs LOGIN</div>
+            <div class="auth-input-group" id="username-group">
+                <label>Username</label>
+                <input type="text" id="auth-username" class="auth-input" placeholder="Enter username">
+            </div>
+            <div class="auth-input-group">
+                <label>Email Address</label>
+                <input type="email" id="auth-email" class="auth-input" placeholder="name@gmail.com">
+            </div>
+            <div class="auth-input-group">
+                <label>Password</label>
+                <input type="password" id="auth-password" class="auth-input" placeholder="••••••••">
+            </div>
+            <button class="btn btn-test" style="width:100%; justify-content:center; padding:12px; margin-bottom:15px;" onclick="handleAuthSubmit()" id="auth-submit-btn">SIGN UP & ENTER</button>
+            <p style="font-size:12px; text-align:center; color:#8fa0bc;">
+                <span id="auth-toggle-text">Already have an account?</span> 
+                <a href="javascript:void(0)" onclick="toggleAuthMode()" id="auth-toggle-link" style="color:#00e5ff; font-weight:bold;">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="logo-area">
+            <span class="logo-text">SITHIJA<span class="highlight">APIs</span></span>
+        </div>
+        <div class="status-area">
+            <span>COIN GATEWAY: <span class="green-text">ONLINE</span></span>
+            <button class="btn-buy-coins" onclick="openBuyCoinsTab()"><i class="fa-brands fa-whatsapp"></i> BUY COINS</button>
+            <button class="btn-admin-tab" onclick="openAdminTab()"><i class="fa-solid fa-lock"></i> OPEN ADMIN PANEL</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div>
+            <div class="column-title"><i class="fa-solid fa-cubes"></i> AVAILABLE ENDPOINTS</div>
+            
+            <div class="global-user-box">
+                <label><i class="fa-solid fa-user"></i> LOGGED IN USER <span class="logout-link" onclick="logoutUser()">[Logout]</span></label>
+                <div class="global-input-wrapper">
+                    <input type="email" id="global-user-email" class="api-input" readonly style="background-color:#0a1626; border-color:#102a45; color:#8fa0bc;">
+                    <div class="global-coin-badge" id="live-coin-count">0 Coins</div>
+                </div>
+            </div>
+
+            <div class="notice-banner">
+                <i class="fa-solid fa-circle-exclamation" style="font-size: 16px;"></i>
+                <span><strong>Notice:</strong> Test button එක එක පාරක් ඔබලා, API response එක ලැබෙනකම් පොඩ්ඩක් ඉවසන්න.</span>
+            </div>
+
+            <div class="api-list">
+                
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-solid fa-robot"></i></div>
+                        <div class="text-box"><h3>Sithija AI Chat <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-ai" class="api-input" value="hi">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/sithijaai?text=', 'val-ai')">TEST</button>
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-solid fa-brain"></i></div>
+                        <div class="text-box"><h3>Gemini AI Pro <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-gemini" class="api-input" value="hello">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/gemini?text=', 'val-gemini')">TEST</button>
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-solid fa-file-audio"></i></div>
+                        <div class="text-box"><h3>Direct Song Downloader <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-down-song" class="api-input" value="manike mage hithe">
+                        <button class="btn btn-test" onclick="runSongApiInline()">TEST</button>
+                    </div>
+                    <div id="song-small-response" style="display:none; margin-top:10px; background:#030a16; border:1px solid #0d2347; padding:10px; border-radius:6px; font-size:11px; max-height:180px; overflow-y:auto; font-family:monospace; color:#00ff66;"></div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-brands fa-android"></i></div>
+                        <div class="text-box"><h3>APK Downloader <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-apk" class="api-input" value="whatsapp">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/download-apk?text=', 'val-apk')">TEST</button>
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-brands fa-pinterest"></i></div>
+                        <div class="text-box"><h3>Pinterest Downloader <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-pin" class="api-input" value="anime">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/pinterest?text=', 'val-pin')">TEST</button>
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-solid fa-music"></i></div>
+                        <div class="text-box"><h3>Song Search Engine <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-song" class="api-input" value="shashika nisansala">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/song?text=', 'val-song')">TEST</button>
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-brands fa-youtube" style="color:red"></i></div>
+                        <div class="text-box"><h3>YouTube MP4 Downloader <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-yt" class="api-input" value="https://youtu.be/NfJZo1H4t7o">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/ytmp4?url=', 'val-yt')">TEST</button>
+                    </div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-info"><div class="icon-box"><i class="fa-brands fa-facebook" style="color:#1877f2"></i></div>
+                        <div class="text-box"><h3>Facebook Downloader <span class="method-badge">GET</span></h3><p>Cost: 1 Coin</p></div>
+                    </div>
+                    <div class="card-bottom">
+                        <input type="text" id="val-fb" class="api-input" placeholder="Facebook video URL...">
+                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/facebook?url=', 'val-fb')">TEST</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div>
+            <div class="column-title"><i class="fa-solid fa-desktop"></i> STREAM MONITOR</div>
+            <div class="display-panel">
+                <div class="panel-header">
+                    <div class="chrome-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                    <div class="browser-url-bar" id="browser-address">chrome://newtab/</div>
+                </div>
+                <div class="browser-body" id="browser-container">
+                    <div class="placeholder-text">The API stream response data will render live here.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let isSignUpMode = true;
+        let currentUserEmail = "";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageMode = urlParams.get('mode');
+
+        // Render Admin Panel Page
+        if (pageMode === 'admin') {
+            document.title = "Sithija APIs - Admin Panel";
+            document.body.innerHTML = `
+                <div style="max-width: 500px; margin: 80px auto; padding: 25px; background: #051124; border: 1px solid #0d2347; border-radius: 8px;">
+                    <div id="admin-login-box" style="text-align: center; padding: 20px 0;">
+                        <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #bd081c; margin-bottom: 15px;"></i>
+                        <h2 style="color: #00e5ff; font-size: 18px; margin-bottom: 10px;">Admin Gateway Panel</h2>
+                        <input type="password" id="admin-pass-input" style="width:100%; padding: 10px; background: #030a16; border: 1px solid #0d2347; color: white; border-radius: 6px; text-align: center; margin-bottom: 15px;" placeholder="Password">
+                        <button onclick="loginAdmin()" style="width:100%; background:#00e5ff; color:#030a16; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">UNLOCK PANEL</button>
+                    </div>
+                    <div id="admin-main-controls" style="display: none;">
+                        <span style="color:#00ff66; font-size:14px; font-weight:bold; display:block; margin-bottom:15px;"><i class="fa-solid fa-unlock"></i> Admin Mode Active</span>
+                        <div style="margin-bottom:12px;">
+                            <label style="display:block; font-size:12px; color:#8fa0bc; margin-bottom:5px;">Customer Email Address</label>
+                            <input type="email" id="admin-email" style="width:100%; padding:8px 12px; background:#030a16; border:1px solid #0d2347; color:white; border-radius:6px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; font-size:12px; color:#8fa0bc; margin-bottom:5px;">Coins to Add</label>
+                            <input type="number" id="admin-coins" value="50" style="width:100%; padding:8px 12px; background:#030a16; border:1px solid #0d2347; color:white; border-radius:6px;">
+                        </div>
+                        <button style="width:100%; background:#0055ff; color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="addCoinsByAdmin()"><i class="fa-solid fa-plus"></i> ADD COINS</button>
+                        <div style="margin-top: 25px; font-size: 13px; color: #00e5ff; font-weight:bold;">User Balance List:</div>
+                        <div id="user-list-box" style="margin-top:10px; background:#030a16; border:1px solid #0d2347; border-radius:6px; padding:10px; max-height:250px; overflow-y:auto; font-size:12px;"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Buy Coins Packages Page
+        if (pageMode === 'buy') {
+            const currentSessionUser = sessionStorage.getItem('logged_in_user') || 'Not Logged In';
+            document.title = "Sithija APIs - Buy Coin Packages";
+            document.body.innerHTML = `
+                <div style="max-width: 700px; margin: 50px auto; padding: 25px; background: #051124; border: 1px solid #0d2347; border-radius: 12px;">
+                    <h2 style="color: #00e5ff; text-align:center;"><i class="fa-solid fa-coins"></i> Coin Buy Gateway</h2>
+                    
+                    <div style="background: rgba(255, 189, 46, 0.1); border: 1px solid #ffbd2e; color: #ffbd2e; padding: 15px; border-radius: 8px; margin-top:20px; font-size:13px;">
+                        <strong>⚠️ Notice (Coin Buy කරන්නේ කෙසේද?):</strong><br>
+                        පහත ඇති පැකේජ් අතුරින් ඔබට අවශ්‍ය පැකේජයේ ඇති <strong>Buy Now</strong> බොත්තම ඔබන්න. එවිට ඔබගේ විස්තර සමඟින් අපගේ නිල WhatsApp (+94742838813) අංකයට පණිවිඩයක් සකස් වේ. එය යොමු කර ගෙවීම් අවසන් කළ පසු Admin විසින් ඔබගේ ගිණුමට කාසි (Coins) එකතු කරනු ඇත.
+                    </div>
+
+                    <div style="margin-top:15px; font-size:13px; color:#8fa0bc;">Logged in User Email: <strong style="color:white;">${currentSessionUser}</strong></div>
+
+                    <div class="pkg-grid">
+                        <div class="pkg-card"><div class="pkg-title">100 Coins</div><button class="btn-buynow" onclick="sendWhatsappOrder(100)">Buy Now</button></div>
+                        <div class="pkg-card"><div class="pkg-title">200 Coins</div><button class="btn-buynow" onclick="sendWhatsappOrder(200)">Buy Now</button></div>
+                        <div class="pkg-card"><div class="pkg-title">300 Coins</div><button class="btn-buynow" onclick="sendWhatsappOrder(300)">Buy Now</button></div>
+                        <div class="pkg-card"><div class="pkg-title">400 Coins</div><button class="btn-buynow" onclick="sendWhatsappOrder(400)">Buy Now</button></div>
+                        <div class="pkg-card"><div class="pkg-title">500 Coins</div><button class="btn-buynow" onclick="sendWhatsappOrder(500)">Buy Now</button></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize Databases
+        if (!localStorage.getItem('sithija_users_db')) localStorage.setItem('sithija_users_db', JSON.stringify({}));
+        if (!localStorage.getItem('sithija_coins_db')) localStorage.setItem('sithija_coins_db', JSON.stringify({}));
+
+        // Real-time synchronization interval
+        setInterval(() => {
+            if (pageMode !== 'admin' && pageMode !== 'buy') {
+                updateLiveCoinBadge();
+            }
+        }, 1000);
+
+        function openAdminTab() { window.open(window.location.pathname + '?mode=admin', '_blank'); }
+        function openBuyCoinsTab() { window.open(window.location.pathname + '?mode=buy', '_blank'); }
+
+        function sendWhatsappOrder(amount) {
+            const user = sessionStorage.getItem('logged_in_user') || 'Unknown User';
+            const msg = `Hello Sithija APIs Admin, I want to purchase ${amount} Coins Package.\n\nUser Email: ${user}`;
+            const whatsappUrl = `https://wa.me/94742838813?text=${encodeURIComponent(msg)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            document.getElementById('auth-panel-title').innerText = isSignUpMode ? "SITHIJA APIs REGISTRATION" : "SITHIJA APIs LOGIN";
+            document.getElementById('username-group').style.display = isSignUpMode ? "block" : "none";
+            document.getElementById('auth-submit-btn').innerText = isSignUpMode ? "SIGN UP & ENTER" : "LOG IN";
+        }
+
+        function handleAuthSubmit() {
+            let email = document.getElementById('auth-email').value.trim();
+            let pass = document.getElementById('auth-password').value;
+            let usersDb = JSON.parse(localStorage.getItem('sithija_users_db')) || {};
+            let coinsDb = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
+
+            if (!email || !pass) { alert("Please fill all fields!"); return; }
+
+            if (isSignUpMode) {
+                let username = document.getElementById('auth-username').value.trim();
+                if (!username) { alert("Enter username!"); return; }
+                if (usersDb[email]) { alert("Email already registered!"); return; }
+
+                usersDb[email] = { username: username, password: pass };
+                coinsDb[email] = 8; 
+                localStorage.setItem('sithija_users_db', JSON.stringify(usersDb));
+                localStorage.setItem('sithija_coins_db', JSON.stringify(coinsDb));
+                alert("Registered! 8 Free Coins Added.");
+            } else {
+                if (!usersDb[email] || usersDb[email].password !== pass) { alert("Invalid Credentials!"); return; }
+            }
+
+            sessionStorage.setItem('logged_in_user', email);
+            initDashboard();
+        }
+
+        function initDashboard() {
+            if (pageMode) return;
+            let user = sessionStorage.getItem('logged_in_user');
+            if (!user) {
+                document.getElementById('auth-screen').style.display = 'flex';
+            } else {
+                document.getElementById('auth-screen').style.display = 'none';
+                currentUserEmail = user;
+                document.getElementById('global-user-email').value = user;
+                updateLiveCoinBadge();
+            }
+        }
+
+        function logoutUser() { sessionStorage.removeItem('logged_in_user'); location.reload(); }
+
+        // Admin panel logic
+        function loginAdmin() {
+            if (document.getElementById('admin-pass-input').value === "admin123") {
+                document.getElementById('admin-login-box').style.display = 'none';
+                document.getElementById('admin-main-controls').style.display = 'block';
+                refreshAdminDatabaseView();
+            } else { alert("Incorrect Password!"); }
+        }
+
+        function refreshAdminDatabaseView() {
+            let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
+            let listBox = document.getElementById('user-list-box');
+            if(!listBox) return; listBox.innerHTML = '';
+            Object.keys(db).forEach(email => {
+                listBox.innerHTML += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #0d2347;"><span>${email}</span><span style="color:#00ff66; font-weight:bold;">${db[email]} Coins</span></div>`;
+            });
+        }
+
+        function addCoinsByAdmin() {
+            let email = document.getElementById('admin-email').value.trim();
+            let coins = parseInt(document.getElementById('admin-coins').value);
+            if (!email) { alert("Enter user email!"); return; }
+            let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
+            db[email] = (db[email] || 0) + coins;
+            localStorage.setItem('sithija_coins_db', JSON.stringify(db));
+            alert(`Added ${coins} coins.`);
+            refreshAdminDatabaseView();
+        }
+
+        function updateLiveCoinBadge() {
+            if (pageMode) return;
+            let badge = document.getElementById('live-coin-count');
+            let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
+            if (currentUserEmail && db[currentUserEmail] !== undefined) {
+                badge.innerText = db[currentUserEmail] + " Coins";
+                badge.style.color = db[currentUserEmail] > 0 ? "#00ff66" : "#ff3333";
+                badge.style.borderColor = db[currentUserEmail] > 0 ? "#00ff66" : "#ff3333";
+            }
+        }
+
+        function runInPanel(apiBaseUrl, inputId) {
+            let queryValue = document.getElementById(inputId).value;
+            let addressBar = document.getElementById('browser-address');
+            let browserContainer = document.getElementById('browser-container');
+            let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
+
+            if (!db[currentUserEmail] || db[currentUserEmail] <= 0) {
+                browserContainer.innerHTML = `
+                    <div style="color:#ff3333; font-family:monospace; padding:20px; font-size:13px; background:#000; height:100%;">
+                        {<br>
+                        &nbsp;&nbsp;"status": false,<br>
+                        &nbsp;&nbsp;"error": "INSUFFICIENT_COINS",<br>
+                        &nbsp;&nbsp;"message": "Sithija API System: You have 0 coins left! Please contact Admin."<br>
+                        }
+                    </div>`;
+                return;
+            }
+
+            db[currentUserEmail] -= 1;
+            localStorage.setItem('sithija_coins_db', JSON.stringify(db));
+            updateLiveCoinBadge();
+
+            let finalUrl = apiBaseUrl + encodeURIComponent(queryValue);
+            addressBar.innerText = finalUrl;
+            browserContainer.innerHTML = `<div class="loading-view"><i class="fa-solid fa-spinner fa-spin" style="font-size:35px;"></i><span>API එකට Call වෙනවා... එක පාරක් ක්ලික් කළා නම් ප්‍රමාණවත්.<br>Response එක ලැබෙන තෙක් තත්පර කිහිපයක් ඉවසන්න...</span></div>`;
+
+            setTimeout(() => { browserContainer.innerHTML = `<iframe class="browser-iframe" src="${finalUrl}"></iframe>`; }, 1200);
+        }
+
+        // Dedicated Small Inline Response Handler for Direct Song Downloader API
+        function runSongApiInline() {
+            let queryValue = document.getElementById('val-down-song').value;
+            let responseBox = document.getElementById('song-small-response');
+            let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
+
+            if (!db[currentUserEmail] || db[currentUserEmail] <= 0) {
+                responseBox.style.display = 'block';
+                responseBox.innerHTML = `<span style="color:#ff3333;">Error: INSUFFICIENT_COINS (0 Coins)</span>`;
+                return;
+            }
+
+            // Deduct Coin
+            db[currentUserEmail] -= 1;
+            localStorage.setItem('sithija_coins_db', JSON.stringify(db));
+            updateLiveCoinBadge();
+
+            // Show Inline Small Loading Status
+            responseBox.style.display = 'block';
+            responseBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#ffbd2e;"></i> Loading song details...`;
+
+            let finalUrl = 'https://api-sithija-main2-production.up.railway.app/download-song?text=' + encodeURIComponent(queryValue);
+            
+            // Fetch and show data working details inside the small box
+            fetch(finalUrl)
+                .then(res => {
+                    if(!res.ok) throw new Error('Network error');
+                    return res.json();
+                })
+                .then(data => {
+                    responseBox.innerHTML = `<div style="color:#00e5ff; font-weight:bold; margin-bottom:5px;">✓ API Response Data:</div><pre style="white-space: pre-wrap; margin:0; line-height:1.4;">${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(err => {
+                    // Fallback if URL content isn't json or direct stream
+                    responseBox.innerHTML = `<div style="color:#ffbd2e; margin-bottom:5px;">⚠️ Data details loaded (Raw link generated):</div><a href="${finalUrl}" target="_blank" style="color:#00ff66; text-decoration:underline;">Click here to view data</a>`;
+                });
+        }
+
+        // Control the Animation Loading view, then prompt login
+        window.onload = function() {
+            setTimeout(() => {
+                let loader = document.getElementById('loading-screen');
+                loader.style.opacity = '0';
+                setTimeout(() => { 
+                    loader.style.display = 'none'; 
+                    initDashboard();
+                }, 500);
+            }, 2500); // 2.5 Seconds Animation time
+        }
+    </script>
 </body>
 </html>
