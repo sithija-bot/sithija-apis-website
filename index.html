@@ -20,51 +20,6 @@
             padding-bottom: 50px;
         }
 
-        /* Pre-login Loading Animation Style */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #030a16;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease, visibility 0.5s;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid #051124;
-            border-top: 5px solid #00e5ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
-        }
-
-        .loading-text {
-            font-size: 26px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            color: #ffffff;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
-        }
-
         /* Auth Screen Styling */
         #auth-screen {
             position: fixed;
@@ -153,20 +108,14 @@
             cursor: pointer;
         }
 
-        /* Container Layout */
+        /* Container Layout - Adjusted for single column focus */
         .container {
-            max-width: 1500px;
+            max-width: 900px;
             margin: 30px auto;
             padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 25px;
-        }
-
-        @media (min-width: 900px) {
-            .container {
-                grid-template-columns: 1.4fr 1.1fr;
-            }
         }
 
         .column-title {
@@ -228,10 +177,7 @@
         .api-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-height: 750px;
-            overflow-y: auto;
-            padding-right: 5px;
+            gap: 15px;
         }
 
         .api-card {
@@ -267,42 +213,30 @@
         .btn-test { background-color: #0055ff; color: white; }
         .btn-test:hover { background-color: #0044cc; }
 
+        /* Inline API Result Box Styling */
+        .api-result-box {
+            display: none;
+            margin-top: 10px;
+            background-color: #030a16;
+            border: 1px solid #0d2347;
+            border-radius: 6px;
+            height: 250px;
+            overflow: hidden;
+        }
+        
+        .result-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #ffffff;
+        }
+
         .auth-input-group { margin-bottom: 15px; }
         .auth-input-group label { display: block; font-size: 12px; color: #8fa0bc; margin-bottom: 5px; }
         .auth-input { width: 100%; padding: 10px; background-color: #030a16; border: 1px solid #0d2347; color: white; border-radius: 6px; }
 
-        /* --- DISPLAY PANEL --- */
-        .display-panel {
-            background-color: #051124;
-            border: 1px solid #0d2347;
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            height: 650px;
-            position: sticky;
-            top: 20px;
-        }
-
-        .panel-header {
-            display: flex; align-items: center; gap: 10px;
-            background-color: #030a16; padding: 6px 10px;
-            border-radius: 50px; border: 1px solid #0d2347; margin-bottom: 10px;
-        }
-
-        .chrome-dots { display: flex; gap: 4px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot-red { background-color: #ff5f56; }
-        .dot-yellow { background-color: #ffbd2e; }
-        .dot-green { background-color: #27c93f; }
-        .browser-url-bar { flex: 1; font-size: 11px; color: #8fa0bc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .browser-body { flex: 1; background-color: #ffffff; border-radius: 6px; overflow: hidden; }
-        .browser-iframe { width: 100%; height: 100%; border: none; background-color: #ffffff; }
-        .placeholder-text { color: #6c7d98; font-size: 12px; text-align: center; margin-top: 220px; font-family: sans-serif; padding: 10px; }
-        
         .logout-link { color: #ff5f56; font-size: 11px; text-decoration: underline; cursor: pointer; margin-left: 10px; }
-        .loading-view { color: #ffbd2e; font-size: 14px; text-align: center; margin-top: 200px; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .loading-view { color: #ffbd2e; font-size: 13px; text-align: center; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; }
 
         /* Package Styles */
         .pkg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -313,12 +247,7 @@
 </head>
 <body>
 
-    <div id="loading-screen">
-        <div class="spinner"></div>
-        <div class="loading-text">SITHIJA <span style="color: #00e5ff;">APIs</span></div>
-    </div>
-
-    <div id="auth-screen" style="display:none;">
+    <div id="auth-screen">
         <div class="auth-container">
             <div class="auth-title" id="auth-panel-title">SITHIJA APIs LOGIN</div>
             <div class="auth-input-group" id="username-group">
@@ -366,7 +295,7 @@
 
             <div class="notice-banner">
                 <i class="fa-solid fa-circle-exclamation" style="font-size: 16px;"></i>
-                <span><strong>Notice:</strong> Test button එක එක පාරක් ඔබලා, API response එක ලැබෙනකම් පොඩ්ඩක් ඉවසන්න.</span>
+                <span><strong>Notice:</strong> Test button එක එක පාරක් ඔබලා, API response එක Card එක යටින් ඇති පෙට්ටියට එනකම් පොඩ්ඩක් ඉවසන්න.</span>
             </div>
 
             <div class="api-list">
@@ -377,8 +306,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-ai" class="api-input" value="hi">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/sithijaai?text=', 'val-ai')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/sithijaai?text=', 'val-ai', 'res-ai')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-ai"></div>
                 </div>
 
                 <div class="api-card">
@@ -387,8 +317,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-gemini" class="api-input" value="hello">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/gemini?text=', 'val-gemini')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/gemini?text=', 'val-gemini', 'res-gemini')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-gemini"></div>
                 </div>
 
                 <div class="api-card">
@@ -397,9 +328,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-down-song" class="api-input" value="manike mage hithe">
-                        <button class="btn btn-test" onclick="runSongApiInline()">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/download-song?text=', 'val-down-song', 'res-down-song')">TEST</button>
                     </div>
-                    <div id="song-small-response" style="display:none; margin-top:10px; background:#030a16; border:1px solid #0d2347; padding:10px; border-radius:6px; font-size:11px; max-height:180px; overflow-y:auto; font-family:monospace; color:#00ff66;"></div>
+                    <div class="api-result-box" id="res-down-song"></div>
                 </div>
 
                 <div class="api-card">
@@ -408,8 +339,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-apk" class="api-input" value="whatsapp">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/download-apk?text=', 'val-apk')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/download-apk?text=', 'val-apk', 'res-apk')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-apk"></div>
                 </div>
 
                 <div class="api-card">
@@ -418,8 +350,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-pin" class="api-input" value="anime">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/pinterest?text=', 'val-pin')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/pinterest?text=', 'val-pin', 'res-pin')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-pin"></div>
                 </div>
 
                 <div class="api-card">
@@ -428,8 +361,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-song" class="api-input" value="shashika nisansala">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/song?text=', 'val-song')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/song?text=', 'val-song', 'res-song')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-song"></div>
                 </div>
 
                 <div class="api-card">
@@ -438,8 +372,9 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-yt" class="api-input" value="https://youtu.be/NfJZo1H4t7o">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/ytmp4?url=', 'val-yt')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/ytmp4?url=', 'val-yt', 'res-yt')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-yt"></div>
                 </div>
 
                 <div class="api-card">
@@ -448,23 +383,11 @@
                     </div>
                     <div class="card-bottom">
                         <input type="text" id="val-fb" class="api-input" placeholder="Facebook video URL...">
-                        <button class="btn btn-test" onclick="runInPanel('https://api-sithija-main2-production.up.railway.app/facebook?url=', 'val-fb')">TEST</button>
+                        <button class="btn btn-test" onclick="runApiTest('https://api-sithija-main2-production.up.railway.app/facebook?url=', 'val-fb', 'res-fb')">TEST</button>
                     </div>
+                    <div class="api-result-box" id="res-fb"></div>
                 </div>
 
-            </div>
-        </div>
-
-        <div>
-            <div class="column-title"><i class="fa-solid fa-desktop"></i> STREAM MONITOR</div>
-            <div class="display-panel">
-                <div class="panel-header">
-                    <div class="chrome-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
-                    <div class="browser-url-bar" id="browser-address">chrome://newtab/</div>
-                </div>
-                <div class="browser-body" id="browser-container">
-                    <div class="placeholder-text">The API stream response data will render live here.</div>
-                </div>
             </div>
         </div>
     </main>
@@ -640,15 +563,18 @@
             }
         }
 
-        function runInPanel(apiBaseUrl, inputId) {
+        // Updated Function to run test inside individual API Card Result Boxes
+        function runApiTest(apiBaseUrl, inputId, resultBoxId) {
             let queryValue = document.getElementById(inputId).value;
-            let addressBar = document.getElementById('browser-address');
-            let browserContainer = document.getElementById('browser-container');
+            let resultContainer = document.getElementById(resultBoxId);
             let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
 
+            // Unhide the current result box
+            resultContainer.style.display = "block";
+
             if (!db[currentUserEmail] || db[currentUserEmail] <= 0) {
-                browserContainer.innerHTML = `
-                    <div style="color:#ff3333; font-family:monospace; padding:20px; font-size:13px; background:#000; height:100%;">
+                resultContainer.innerHTML = `
+                    <div style="color:#ff3333; font-family:monospace; padding:15px; font-size:12px; background:#000; height:100%;">
                         {<br>
                         &nbsp;&nbsp;"status": false,<br>
                         &nbsp;&nbsp;"error": "INSUFFICIENT_COINS",<br>
@@ -663,61 +589,18 @@
             updateLiveCoinBadge();
 
             let finalUrl = apiBaseUrl + encodeURIComponent(queryValue);
-            addressBar.innerText = finalUrl;
-            browserContainer.innerHTML = `<div class="loading-view"><i class="fa-solid fa-spinner fa-spin" style="font-size:35px;"></i><span>API එකට Call වෙනවා... එක පාරක් ක්ලික් කළා නම් ප්‍රමාණවත්.<br>Response එක ලැබෙන තෙක් තත්පර කිහිපයක් ඉවසන්න...</span></div>`;
+            resultContainer.innerHTML = `
+                <div class="loading-view">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;"></i>
+                    <span>Response එක ලැබෙන තෙක් ඉවසන්න...</span>
+                </div>`;
 
-            setTimeout(() => { browserContainer.innerHTML = `<iframe class="browser-iframe" src="${finalUrl}"></iframe>`; }, 1200);
+            setTimeout(() => { 
+                resultContainer.innerHTML = `<iframe class="result-iframe" src="${finalUrl}"></iframe>`; 
+            }, 1200);
         }
 
-        // Dedicated Small Inline Response Handler for Direct Song Downloader API
-        function runSongApiInline() {
-            let queryValue = document.getElementById('val-down-song').value;
-            let responseBox = document.getElementById('song-small-response');
-            let db = JSON.parse(localStorage.getItem('sithija_coins_db')) || {};
-
-            if (!db[currentUserEmail] || db[currentUserEmail] <= 0) {
-                responseBox.style.display = 'block';
-                responseBox.innerHTML = `<span style="color:#ff3333;">Error: INSUFFICIENT_COINS (0 Coins)</span>`;
-                return;
-            }
-
-            // Deduct Coin
-            db[currentUserEmail] -= 1;
-            localStorage.setItem('sithija_coins_db', JSON.stringify(db));
-            updateLiveCoinBadge();
-
-            // Show Inline Small Loading Status
-            responseBox.style.display = 'block';
-            responseBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#ffbd2e;"></i> Loading song details...`;
-
-            let finalUrl = 'https://api-sithija-main2-production.up.railway.app/download-song?text=' + encodeURIComponent(queryValue);
-            
-            // Fetch and show data working details inside the small box
-            fetch(finalUrl)
-                .then(res => {
-                    if(!res.ok) throw new Error('Network error');
-                    return res.json();
-                })
-                .then(data => {
-                    responseBox.innerHTML = `<div style="color:#00e5ff; font-weight:bold; margin-bottom:5px;">✓ API Response Data:</div><pre style="white-space: pre-wrap; margin:0; line-height:1.4;">${JSON.stringify(data, null, 2)}</pre>`;
-                })
-                .catch(err => {
-                    // Fallback if URL content isn't json or direct stream
-                    responseBox.innerHTML = `<div style="color:#ffbd2e; margin-bottom:5px;">⚠️ Data details loaded (Raw link generated):</div><a href="${finalUrl}" target="_blank" style="color:#00ff66; text-decoration:underline;">Click here to view data</a>`;
-                });
-        }
-
-        // Control the Animation Loading view, then prompt login
-        window.onload = function() {
-            setTimeout(() => {
-                let loader = document.getElementById('loading-screen');
-                loader.style.opacity = '0';
-                setTimeout(() => { 
-                    loader.style.display = 'none'; 
-                    initDashboard();
-                }, 500);
-            }, 2500); // 2.5 Seconds Animation time
-        }
+        window.onload = function() { initDashboard(); }
     </script>
 </body>
 </html>
